@@ -138,7 +138,7 @@ if uploaded_file is not None:
                             )
 
                             # Add a download button for the extracted data
-                            if st.button(f"Download Invoice {idx + 1} Data"):
+                            if st.button(f"Download Invoice Data"):
                                 # Convert to CSV
                                 csv = df.to_csv(index=False)
                                 st.download_button(
