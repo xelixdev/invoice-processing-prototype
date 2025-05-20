@@ -53,7 +53,7 @@ if uploaded_file is not None:
                 st.stop()
 
         # Show processing status
-        with st.spinner("Processing document with AWS Bedrock..."):
+        with st.spinner("Processing document..."):
             # Extract data using Bedrock
             extracted_data = bedrock_client.extract_invoice_data(image_base64)
 
@@ -88,25 +88,28 @@ if uploaded_file is not None:
                         col1, col2 = st.columns(2)
 
                         with col1:
-                            st.write(
-                                f"**Invoice Number:** {invoice.get('number', 'N/A')}"
-                            )
-                            st.write(
-                                f"**PO Number:** {invoice.get('po_number', 'N/A')}"
-                            )
-                            st.write(f"**Vendor:** {invoice.get('vendor', 'N/A')}")
-                            st.write(f"**Invoice Date:** {invoice.get('date', 'N/A')}")
-                            st.write(f"**Due Date:** {invoice.get('due_date', 'N/A')}")
+                            st.write(f"**Invoice Number:** {invoice.get('number', '')}")
+                            st.write(f"**PO Number:** {invoice.get('po_number', '')}")
+                            st.write(f"**Vendor:** {invoice.get('vendor', '')}")
+                            st.write(f"**Invoice Date:** {invoice.get('date', '')}")
+                            st.write(f"**Due Date:** {invoice.get('due_date', '')}")
                             st.write(
                                 f"**Payment Terms:** {invoice.get('payment_terms', '')}"
                             )
 
                         with col2:
                             currency = invoice.get("currency_code", "")
-                            amount = invoice.get("amount", 0)
-                            tax_amount = invoice.get("tax_amount", 0)
-                            st.write(f"**Total Amount:** {currency} {amount:,.2f}")
-                            st.write(f"**Tax Amount:** {currency} {tax_amount:,.2f}")
+                            amount = invoice.get("amount", "")
+                            tax_amount = invoice.get("tax_amount", "")
+                            st.write(f"**Currency:** {currency}")
+                            if amount:
+                                st.write(f"**Total Amount:** {float(amount):,.2f}")
+                            else:
+                                st.write(f"**Total Amount:**")
+                            if tax_amount:
+                                st.write(f"**Tax Amount:** {float(tax_amount):,.2f}")
+                            else:
+                                st.write(f"**Tax Amount:**")
 
                         # Display line items in a table
                         if "line_items" in invoice:
