@@ -14,7 +14,7 @@ class BedrockClient:
         session = boto3.Session(region_name="us-east-1")
         self.client = session.client("bedrock-runtime")
         self.model_id = (
-            "anthropic.claude-3-sonnet-20240229-v1:0"  # Using Claude 3 Sonnet
+            "anthropic.claude-3-5-sonnet-20240620-v1:0"  # Using Claude 3.5 Sonnet
         )
 
     def _parse_numeric(self, value: str) -> float:
