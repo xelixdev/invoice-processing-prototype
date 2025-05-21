@@ -6,4 +6,5 @@ boto3==1.34.69
 PyMuPDF==1.23.26
 numpy==1.26.4
 opencv-python==4.9.0.80
-Pillow==10.2.0 
+Pillow==10.2.0
+anthropic==0.51.0 

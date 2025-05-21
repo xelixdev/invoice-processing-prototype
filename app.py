@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 from bedrock_client import BedrockClient
+from anthropic_client import AnthropicClient
 from image_processor import get_image_from_pdf
 import base64
 from io import BytesIO
@@ -33,8 +34,19 @@ st.markdown(
 
 st.title("📄 Invoice Processing Platform")
 
-# Initialize Bedrock client
-bedrock_client = BedrockClient()
+# Add API selection
+api_option = st.radio(
+    "Select API Provider",
+    ["Anthropic API", "AWS Bedrock"],
+    horizontal=True,
+    help="Choose which API to use for invoice processing"
+)
+
+# Initialize appropriate client
+if api_option == "Anthropic API":
+    client = AnthropicClient()
+else:
+    client = BedrockClient()
 
 # File uploader
 uploaded_file = st.file_uploader("Upload an invoice (PDF)", type=["pdf"])
@@ -55,7 +67,7 @@ if uploaded_file is not None:
         # Show processing status
         with st.spinner("Processing document..."):
             # Extract data using Bedrock
-            extracted_data = bedrock_client.extract_invoice_data(image_base64)
+            extracted_data = client.extract_invoice_data(image_base64)
 
             if extracted_data is None:
                 st.error("Failed to extract data from the document. Please try again.")
