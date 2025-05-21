@@ -79,7 +79,7 @@ if uploaded_file is not None:
             # Display the processed image in the left column
             with preview_col:
                 st.subheader("Document Preview")
-                st.image(base64.b64decode(image_base64), use_column_width=True)
+                st.image(base64.b64decode(image_base64), use_container_width=True)
 
             # Display extracted data in the right column
             with data_col:
