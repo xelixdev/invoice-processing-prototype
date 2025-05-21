@@ -40,37 +40,43 @@ class BedrockClient:
             parsed_items.append(parsed_item)
         return parsed_items
 
-    def extract_invoice_data(self, image_base64: str) -> Dict[str, Any]:
+    def extract_invoice_data(self, image_base64_list: list[str]) -> Dict[str, Any]:
         """
-        Extract invoice data using AWS Bedrock's Claude model from an image.
+        Extract invoice data using AWS Bedrock's Claude model from a list of images.
 
         Args:
-            image_base64 (str): Base64 encoded image of the invoice
+            image_base64_list (list[str]): List of base64 encoded images of the invoice pages
 
         Returns:
             Dict[str, Any]: Extracted invoice data
         """
         try:
+            # Construct the content list with multiple images and the prompt
+            content_list = []
+            # The prompt text should come first for Claude via Bedrock according to some examples
+            content_list.append({"type": "text", "text": INVOICE_EXTRACTION_PROMPT})
+            for image_data in image_base64_list:
+                content_list.append(
+                    {
+                        "type": "image",
+                        "source": {
+                            "type": "base64",
+                            "media_type": "image/jpeg",
+                            "data": image_data,
+                        },
+                    }
+                )
+
             response = self.client.invoke_model(
                 modelId=self.model_id,
                 body=json.dumps(
                     {
                         "anthropic_version": "bedrock-2023-05-31",
-                        "max_tokens": 1000,
+                        "max_tokens": 4096,  # Increased max_tokens
                         "messages": [
                             {
                                 "role": "user",
-                                "content": [
-                                    {"type": "text", "text": INVOICE_EXTRACTION_PROMPT},
-                                    {
-                                        "type": "image",
-                                        "source": {
-                                            "type": "base64",
-                                            "media_type": "image/jpeg",
-                                            "data": image_base64,
-                                        },
-                                    },
-                                ],
+                                "content": content_list,  # Use the constructed content list
                             }
                         ],
                     }

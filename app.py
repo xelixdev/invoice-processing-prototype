@@ -57,17 +57,17 @@ if uploaded_file is not None:
         pdf_bytes = uploaded_file.read()
 
         # Convert PDF to image
-        with st.spinner("Converting PDF to image..."):
-            image_base64 = get_image_from_pdf(pdf_bytes)
+        with st.spinner("Converting PDF to images..."):
+            image_base64_list = get_image_from_pdf(pdf_bytes)
 
-            if image_base64 is None:
-                st.error("Failed to process the PDF. Please try again.")
+            if not image_base64_list:
+                st.error("Failed to process the PDF or no images found. Please try again.")
                 st.stop()
 
         # Show processing status
         with st.spinner("Processing document..."):
-            # Extract data using Bedrock
-            extracted_data = client.extract_invoice_data(image_base64)
+            # Extract data using the selected client
+            extracted_data = client.extract_invoice_data(image_base64_list)
 
             if extracted_data is None:
                 st.error("Failed to extract data from the document. Please try again.")
@@ -78,8 +78,9 @@ if uploaded_file is not None:
 
             # Display the processed image in the left column
             with preview_col:
-                st.subheader("Document Preview")
-                st.image(base64.b64decode(image_base64), use_container_width=True)
+                st.subheader("Document Preview (First Page)")
+                if image_base64_list:
+                    st.image(base64.b64decode(image_base64_list[0]), use_container_width=True)
 
             # Display extracted data in the right column
             with data_col:

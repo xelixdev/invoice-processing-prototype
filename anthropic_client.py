@@ -41,26 +41,31 @@ class AnthropicClient:
             parsed_items.append(parsed_item)
         return parsed_items
 
-    def extract_invoice_data(self, image_base64: str) -> Dict[str, Any]:
-        """Extract invoice data from an image using Anthropic's Claude."""
+    def extract_invoice_data(self, image_base64_list: list[str]) -> Dict[str, Any]:
+        """Extract invoice data from a list of images using Anthropic's Claude."""
         try:
+            # Construct the content list with multiple images and the prompt
+            content_list = []
+            for image_data in image_base64_list:
+                content_list.append(
+                    {
+                        "type": "image",
+                        "source": {
+                            "type": "base64",
+                            "media_type": "image/jpeg",
+                            "data": image_data,
+                        },
+                    }
+                )
+            content_list.append({"type": "text", "text": INVOICE_EXTRACTION_PROMPT})
+
             response = self.client.messages.create(
                 model=self.model,
-                max_tokens=2048,
+                max_tokens=4096, # Increased max_tokens for potentially longer multi-page documents
                 messages=[
                     {
                         "role": "user",
-                        "content": [
-                            {
-                                "type": "image",
-                                "source": {
-                                    "type": "base64",
-                                    "media_type": "image/jpeg",
-                                    "data": image_base64,
-                                },
-                            },
-                            {"type": "text", "text": INVOICE_EXTRACTION_PROMPT}
-                        ],
+                        "content": content_list, # Use the constructed content list
                     }
                 ],
             )
